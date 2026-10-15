@@ -67,6 +67,8 @@ import com.pokedaisy.app.companion.data.BATTLE_INPUT_MOVE_SELECT
 import com.pokedaisy.app.companion.data.BATTLE_INPUT_PARTY_OPEN
 import com.pokedaisy.app.companion.data.BATTLE_INPUT_TARGET_SELECT
 import com.pokedaisy.app.companion.data.GameKind
+import com.pokedaisy.app.companion.data.PinballCollectionSnapshot
+import com.pokedaisy.app.companion.data.PinballPhase
 import com.pokedaisy.app.companion.data.SnapshotView
 import com.pokedaisy.app.companion.data.showsBattle
 import com.pokedaisy.app.companion.data.hasData
@@ -220,7 +222,7 @@ fun CompanionScreen(
         // Tabs this game has: DEX needs the ROM's dex tables, GUIDE a guide or evolutions.
         // The launch's saved copy names the ones it had, which wait on LOADING for the live data.
         val cachedTabs = snapshot.cachedTabs.orEmpty()
-        val available = if (pinball != null) listOfNotNull("PINBALL", "STATES", "ACHIEVEMENTS".takeIf { achievements != null }) else COMPANION_TABS.filter { id ->
+        val available = if (pinball != null) listOfNotNull("PINBALL", "COLLECT", "STATES", "ACHIEVEMENTS".takeIf { achievements != null }) else COMPANION_TABS.filter { id ->
             when (id) {
                 "DEX" -> dex != null || id in cachedTabs
                 "GUIDE" -> guide != null || id in cachedTabs
@@ -474,6 +476,12 @@ fun CompanionScreen(
                             TrainerCardScreen(card, cardArt, Modifier.fillMaxSize(), initialBack = initialCardBack)
                         } else if (tab == "PINBALL" && pinball != null) {
                             PinballScreen(pinball, Modifier.fillMaxSize())
+                        } else if (tab == "COLLECT" && pinball != null) {
+                            PinballCollectionScreen(
+                                snapshot.pinballCollection ?: PinballCollectionSnapshot(PinballPhase.UNAVAILABLE,
+                                    detail = "Waiting for fresh collection data."),
+                                Modifier.fillMaxSize(),
+                            )
                         } else if (tab == "MAP") {
                             MapScreen(snapshot, modifier = Modifier.fillMaxSize(), fly = fly)
                         } else if (tab == "PARTY") {

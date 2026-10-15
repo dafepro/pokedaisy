@@ -25,7 +25,8 @@ gradle render -Ponly=pinball -Pdark=true -Pout=build/pinball-dark
 gradle render -Ponly=pinball-synthetic-back-navigation-thor -PpinballNavRounds=2
 ```
 
-The Pinball tests and screenshots use synthetic data, not a ROM or captured gameplay.
+The default Pinball tests and screenshots use synthetic data, not a ROM or captured gameplay.
+The opt-in private capture-driven collection renders are described below.
 They check the reader's bounds and state transitions, the actual Compose layout, and
 repeated SETTINGS / STATES / BACK navigation. They do not establish live-ROM or Android-device correctness.
 The root `test` task also verifies that the website's checked-in compatibility data
@@ -126,3 +127,24 @@ values use literal `null`. Author expectations from independent game-screen
 observations, not by copying the decoder output. Keep the ROM, RAM, saves and
 frames outside this repository. This tool does not demonstrate Android/JNI or
 on-device UI integration by itself.
+
+The checker also runs the collection reader. A separate `collection-expected.tsv`
+can assert collection summaries and per-entry states; see
+[`docs/PINBALL_COLLECTION.md`](../docs/PINBALL_COLLECTION.md). Add
+`-PcollectionDetails=true` to print the current catalog rows as well as summaries.
+The ordinary `pinball-collection-synthetic-*` previews use fictional names.
+
+To render the real collection UI from one private, captured game state:
+
+```sh
+gradle -p ui-preview render -Ponly=pinball-collection-captured \
+  -PpinballRom=/private/PokemonPinball.gba \
+  -PpinballCapture=/private/catch-captures/ruby_catch_registered/ewram.bin \
+  -Pout=/private/capture-driven-ui
+```
+
+This verifies the exact ROM and decodes its names/pools together with the captured
+RAM. The screenshot is marked `CAPTURED`; values come from the production reader.
+It is a Desktop rendering of recorded state, not a live Android screenshot. No
+ROM art is extracted. Choose a PLAYING collection capture with an actual evolvable
+party for both Catch and Evolve shots. Keep inputs and resulting images private.

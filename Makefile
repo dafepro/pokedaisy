@@ -8,7 +8,10 @@
 SHELL := /bin/bash
 -include local.mk
 
-PKG           := com.pokedaisy.app
+# Debug installs beside upstream. Override deliberately, e.g.
+# `make run PKG=com.pokedaisy.app` to launch the upstream package after installation.
+# Activity classes keep the original namespace even when the application ID differs.
+PKG           ?= com.pokedaisy.app.pinball.debug
 CAPTURE_IMAGE := pokedaisy-capture
 
 # Read by scripts/decomps.py and ui-preview (see docs/DEVELOPMENT.md "Build").
@@ -43,7 +46,7 @@ install: ## Build + install on a connected Android device (adb)
 	./gradlew :app:installDebug
 
 run: install ## Build + install + launch the library screen on the connected device
-	adb shell am start -n $(PKG)/.LibraryActivity
+	adb shell am start -n $(PKG)/com.pokedaisy.app.LibraryActivity
 
 test: ## JVM unit tests (fixture decode tests, UI logic)
 	./gradlew :app:testDebugUnitTest

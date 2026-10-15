@@ -13,13 +13,21 @@
 #
 # Usage: scripts/capture_fixture.sh <key> [device-serial]
 #   <key> must match the first column of roms.conf.
+#   Defaults to this fork's isolated debug package. For deliberate upstream
+#   testing: PKG=com.pokedaisy.app scripts/capture_fixture.sh <key> [device-serial].
+#   The selected build must expose the debug activity; signed releases do not.
+#   roms.conf paths are unchanged and must be readable by the selected package.
+#
+# This is the existing RPG fixture workflow, which writes into the repository.
+# Do not use it for Pinball ROM/RAM captures. Pinball's private workflow is
+# scripts/capture_pinball.py or scripts/capture_pinball_modes.py; see native-capture/PINBALL.md.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONF="$SCRIPT_DIR/roms.conf"
 KEY="${1:-}"
 SERIAL="${2:-}"
-PKG="com.pokedaisy.app"
+PKG="${PKG:-com.pokedaisy.app.pinball.debug}"
 DEVICE_BASE="/storage/emulated/0/Android/data/$PKG/files"
 OUT_ROOT="$SCRIPT_DIR/../app/src/test/resources/fixtures"
 
@@ -67,7 +75,7 @@ already_running=0
 if "${ADB[@]}" shell pidof "$PKG" >/dev/null 2>&1; then
     already_running=1
     echo "App already running - dumping the live session (no restart)..."
-    "${ADB[@]}" shell "am start -n '$PKG/.PokeDaisyActivity' --es dumpFixture '$device_dump_dir'" >/dev/null
+    "${ADB[@]}" shell "am start -n '$PKG/com.pokedaisy.app.PokeDaisyActivity' --es dumpFixture '$device_dump_dir'" >/dev/null
     for _ in $(seq 1 20); do
         sleep 1
         if "${ADB[@]}" logcat -d 2>/dev/null | grep -q "pokedaisy: fixture dump: wrote"; then
@@ -82,7 +90,7 @@ if ! "${ADB[@]}" logcat -d 2>/dev/null | grep -q "pokedaisy: fixture dump: wrote
     fi
     "${ADB[@]}" shell am force-stop "$PKG" >/dev/null 2>&1
     "${ADB[@]}" logcat -c
-    "${ADB[@]}" shell "am start -n '$PKG/.PokeDaisyActivity' --es rom '$path' --es dumpFixture '$device_dump_dir'" >/dev/null
+    "${ADB[@]}" shell "am start -n '$PKG/com.pokedaisy.app.PokeDaisyActivity' --es rom '$path' --es dumpFixture '$device_dump_dir'" >/dev/null
     echo "Waiting for the dump to land (up to 20s)..."
     for _ in $(seq 1 20); do
         sleep 1

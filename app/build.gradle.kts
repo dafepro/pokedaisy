@@ -112,6 +112,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            // The experimental Pinball APK installs beside the signed release, with
+            // its own app data and FileProvider authority. Keep namespace/JNI names.
+            applicationIdSuffix = ".pinball.debug"
+            versionNameSuffix = "-pinball-debug"
+            // Trim only unused Material icons to keep the experimental APK small.
+            // Every other class/member is kept; optimization and renaming stay off.
+            isMinifyEnabled = true
+            proguardFiles("proguard-pinball-debug.pro")
+        }
         release {
             isMinifyEnabled = false
             if (keystoreProps != null) signingConfig = signingConfigs.getByName("release")
@@ -146,6 +156,14 @@ android {
 
     testOptions {
         unitTests.isIncludeAndroidResources = false
+    }
+}
+
+// Compress native libraries only in the experimental APK. Android extracts them
+// at install time; release keeps its existing direct-from-APK loading behavior.
+androidComponents {
+    onVariants(selector().withBuildType("debug")) { variant ->
+        variant.packaging.jniLibs.useLegacyPackaging.set(true)
     }
 }
 

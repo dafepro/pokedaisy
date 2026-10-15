@@ -1,0 +1,23 @@
+# Exact BPPE rev0; pinned mGBA 26b7884. Ordinary controller inputs only.
+# @OUT@ is a private capture directory outside the repository.
+loadstate @OUT@/ruby_catch_hits_1/state
+keys NONE
+dump @OUT@/ruby_catch_before_pause
+shot @OUT@/ruby_catch_before_pause/screen.ppm
+savestate @OUT@/ruby_catch_before_pause/state
+press START
+dump @OUT@/ruby_catch_paused
+shot @OUT@/ruby_catch_paused/screen.ppm
+savestate @OUT@/ruby_catch_paused/state
+wait 120
+dump @OUT@/ruby_catch_paused_later
+shot @OUT@/ruby_catch_paused_later/screen.ppm
+savestate @OUT@/ruby_catch_paused_later/state
+press START
+dump @OUT@/ruby_catch_resumed
+shot @OUT@/ruby_catch_resumed/screen.ppm
+savestate @OUT@/ruby_catch_resumed/state
+wait 60
+dump @OUT@/ruby_catch_resumed_later
+shot @OUT@/ruby_catch_resumed_later/screen.ppm
+savestate @OUT@/ruby_catch_resumed_later/state

@@ -78,6 +78,9 @@ tasks.register<JavaExec>("render") {
     systemProperty("companionH", (project.findProperty("companionH") as String?) ?: "")
     // Pinball's repeated navigation checks; bounded to 1..10 rounds, default 4.
     systemProperty("pinballNavRounds", (project.findProperty("pinballNavRounds") as String?) ?: "4")
+    // Private capture-driven Pinball UI evidence, separate from RPG art and synthetic previews.
+    systemProperty("pinballRom", (project.findProperty("pinballRom") as String?) ?: "")
+    systemProperty("pinballCapture", (project.findProperty("pinballCapture") as String?) ?: "")
     // Optional: a ROM the GUIDE's live pages (HERE, NEXT BOSS) read from, with the
     // repo's save fixture for that game - see Main.kt's liveGuide().
     systemProperty("rom", (project.findProperty("rom") as String?) ?: "")

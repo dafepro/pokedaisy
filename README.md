@@ -33,12 +33,12 @@ Based on PokeDaisy by Lidor Itzhari - https://github.com/lidor30/pokedaisy
 This fork adds an experimental, read-only **Pokémon Pinball: Ruby & Sapphire**
 companion: current objective, mode timer/progress, saver and run status, with the
 original physics and game screen unchanged. Only exact English BPPE revision 0
-is mapped. **Basic play is checked with private real-game captures; advanced
-modes and Android integration still need validation.** This is an experimental
+is mapped. **Basic play, natural Catch modes and collection updates are checked with
+private real-game captures; full Evolution and Android integration still need validation.** This is an experimental
 source branch, not a new APK release. No games or game art are included.
 
 See [implementation, evidence and limits](docs/PINBALL.md) and the
-[Pinball manual](docs/manual/pinball.md). Collection planning, practice scenarios,
+[Pinball manual](docs/manual/pinball.md). On-demand collection planning is included; practice scenarios,
 post-run results and full-table rendering remain later work.
 
 ## Devices

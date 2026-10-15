@@ -16,6 +16,7 @@ sourceSets["main"].kotlin.srcDir("shims")
 sourceSets["test"].kotlin.apply {
     srcDir(rootDir.resolve("../app/src/test/kotlin"))
     include("**/PinballReaderTest.kt")
+    include("**/PinballCollectionReaderTest.kt")
 }
 tasks.named<KotlinCompile>("compileKotlin") { source(appSrc) }
 tasks.withType<KotlinCompile>().configureEach {
@@ -37,6 +38,7 @@ tasks.register<JavaExec>("pinballCapture") {
     val captures = providers.gradleProperty("captures")
     doFirst {
         require(rom.isPresent && captures.isPresent) { "Pass -Prom and -Pcaptures; keep both outside the repository." }
-        args = listOf(File(rom.get()).absolutePath, File(captures.get()).absolutePath)
+        args = listOf(File(rom.get()).absolutePath, File(captures.get()).absolutePath) +
+            if (providers.gradleProperty("collectionDetails").orNull == "true") listOf("--collection-details") else emptyList()
     }
 }

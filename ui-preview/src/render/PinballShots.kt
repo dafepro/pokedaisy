@@ -19,6 +19,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import com.pokedaisy.app.companion.CompanionSettings
 import com.pokedaisy.app.companion.StateSlots
 import com.pokedaisy.app.companion.data.PinballPhase
+import com.pokedaisy.app.companion.data.PinballCollectionSnapshot
 import com.pokedaisy.app.companion.data.PinballSnapshot
 import com.pokedaisy.app.companion.data.SnapshotView
 import com.pokedaisy.app.companion.ui.CompanionBack
@@ -94,7 +95,7 @@ fun pinballShots(): List<Shot> = buildList {
         // Repeated samples must not pull the user out of SETTINGS or STATES.
         val sampled = mutableStateOf(syntheticPinballStates.getValue("catch"))
         add(Shot("pinball-synthetic-sampling-navigation-${device.name}", device.w, device.h, device.density,
-            pinballCompanion { sampled.value }) {
+            pinballCompanion(state = { sampled.value })) {
             repeat(pinballNavRounds) { round ->
                 println("pinball sampling ${device.name} round $round: open Settings")
                 onNodeWithContentDescription("Settings").performClick()
@@ -171,9 +172,13 @@ private object PinballSlots : StateSlots {
     override fun requestUndoLoad() {}
 }
 
-private fun pinballCompanion(state: PinballSnapshot) = pinballCompanion { state }
+private fun pinballCompanion(state: PinballSnapshot) = pinballCompanion(state = { state })
 
-private fun pinballCompanion(state: () -> PinballSnapshot): () -> (@Composable () -> Unit) = {
+internal fun pinballCompanion(
+    state: () -> PinballSnapshot,
+    collection: () -> PinballCollectionSnapshot? = { null },
+    initialTab: String = "PARTY",
+): () -> (@Composable () -> Unit) = {
     val back = CompanionBack().also { previewBack = it }
     val settings = object : CompanionSettings by FakeSettings() {
         override val gameName = "Synthetic Pinball preview"
@@ -185,13 +190,13 @@ private fun pinballCompanion(state: () -> PinballSnapshot): () -> (@Composable (
     }
     val content: @Composable () -> Unit = {
         // Deliberately leave initialTab at its default to test automatic PINBALL selection.
-        CompanionScreen(SnapshotView(connected = true, game = null, pinball = state()),
-            slots = PinballSlots, settings = settings, back = back)
+        CompanionScreen(SnapshotView(connected = true, game = null, pinball = state(), pinballCollection = collection()),
+            slots = PinballSlots, settings = settings, back = back, initialTab = initialTab)
     }
     content
 }
 
-private fun SkikoComposeUiTest.settlePinball() {
+internal fun SkikoComposeUiTest.settlePinball() {
     repeat(20) { mainClock.advanceTimeByFrame() }
 }
 

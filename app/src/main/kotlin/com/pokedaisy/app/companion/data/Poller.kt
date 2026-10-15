@@ -299,7 +299,11 @@ class TelemetrySampler {
             quetzalNames = nativeCfg?.takeIf { it.quetzalPlacesDefault >= 0 }
                 ?.let { runCatching { readQuetzalNames(reader, it) }.getOrNull() } ?: QuetzalNames()
 
-            if (pinballDetected) return SnapshotView(connected = true, pinball = PinballReader.read(reader))
+            if (pinballDetected) return SnapshotView(
+                connected = true,
+                pinball = PinballReader.read(reader),
+                pinballCollection = PinballCollectionReader.read(reader),
+            )
 
             val telemetry = when (kind) {
                 // English Unbound leaves nativeCfg null (see detect()); its French translation sets its own.

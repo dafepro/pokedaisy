@@ -54,6 +54,11 @@ class AppUpdateFlow(private val activity: ComponentActivity) {
 
     /** Looks for a newer release off the UI thread; [manual] reports "up to date" / offline too. */
     fun check(manual: Boolean = false) {
+        // The isolated debug app must not offer upstream release APKs as its own updates.
+        if (BuildConfig.DEBUG) {
+            if (manual) Toast.makeText(activity, tr("In-app updates are off in this debug build"), Toast.LENGTH_SHORT).show()
+            return
+        }
         if (checking) return
         checking = true
         Thread({

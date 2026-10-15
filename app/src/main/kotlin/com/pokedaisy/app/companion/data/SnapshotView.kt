@@ -142,6 +142,8 @@ data class SnapshotView(
     val connected: Boolean,
     /** Exact-version Pinball companion; independent of the RPG party/map model. */
     val pinball: PinballSnapshot? = null,
+    /** On-demand collection panel data, sampled on the emulator thread with [pinball]. */
+    val pinballCollection: PinballCollectionSnapshot? = null,
     val error: String? = null,
     /** The running ROM is one the companion can't read (see TelemetrySampler.detect). */
     val unsupported: Boolean = false,

@@ -18,4 +18,5 @@ internal fun allTranslationTables(): List<Map<String, Tr>> = listOf(
     trLibrary,
     trCompanion,
     trCompanionInfo,
+    trPinballCollection,
 )

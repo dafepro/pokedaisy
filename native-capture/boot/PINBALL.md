@@ -56,10 +56,13 @@ also requires both reloads to restore byte-identical full EWRAM.
 - Restoring an earlier real state after later gameplay
 
 The demo happens to contain Catch-like data. It validates exclusion of demo
-play; it **does not validate live Catch guidance**. Catch, Evolution, event timer
-boundaries, extra balls, bonus stages, rewind, Android/JNI rendering, hardware
-behavior, latency and performance remain unverified by this sequence. The
-private mGBA save-state reload is not an Android application state-load test.
+play; it **does not validate live Catch guidance**. This original sequence
+still does not cover advanced modes. The separate [natural Catch suite](../PINBALL.md)
+now covers both tables, capture registration, pause and timeout boundaries
+with 57 additional samples, 554 mode assertions and 375 collection assertions. Evolution, extra balls, bonus
+stages, rewind, Android/JNI rendering, hardware behavior, latency and performance
+remain unverified by these suites. A private mGBA save-state reload is not an
+Android application state-load test.
 
 `press` consumes two frames. `hold KEYS N` consumes N+1 frames. Timing is pinned
 to this emulator/ROM combination, with a fresh session and no prior save file.

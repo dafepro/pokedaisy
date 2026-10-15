@@ -945,6 +945,8 @@ fun main(args: Array<String>) {
     val tw = 1920; val th = 1080; val td = 2.5f
     val all = listOf(
         *pinballShots().toTypedArray(),
+        *pinballCollectionShots().toTypedArray(),
+        *pinballCapturedShots().toTypedArray(),
         Shot("$g-party", bw, bh, bd, companion("PARTY")),
         // The lead holds a Potion, the second a QUICK CLAW: the tag in each slot's corner and the game's marker by the icon.
         Shot("$g-party-held", bw, bh, bd, companion("PARTY") {
