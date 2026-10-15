@@ -31,7 +31,7 @@ object PinballRsProfile {
 
 /** Small, side-effect-free reads between emulated frames. Never changes physics, inputs or saves.
  * All offsets describe the exact profile above; the caller must verify it before calling [read].
- * This is a source-mapped experimental reader, not a claim of live-ROM validation.
+ * Basic play is checked with private headless captures; advanced modes and Android need validation.
  */
 object PinballReader {
     const val GAME = 0x02000000L
@@ -63,18 +63,18 @@ object PinballReader {
         if (reader.exact(GAME_POINTER, 4).u32(0) != GAME) return unavailable("The gameplay memory pointer is not ready.")
         val field = main.u8(4)
         if (field !in 0..7) return unavailable("Unrecognized table.")
+        val mainTable = field < 2
         val game = reader.exact(GAME, GAME_BYTES)
         val mode = game.s8(0x13)
         val transition = game.s8(0x16)
         val sub = game.s8(0x17)
-        if (transition !in 0..2 || mode !in 0..8) return unavailable("Unrecognized board state.")
+        if (mainTable && (transition !in 0..2 || mode !in 0..8)) return unavailable("Unrecognized board state.")
         val scoreLow = game.u32(0x44)
         val scoreHigh = game.u32(0x48)
         val score = if (scoreLow < 100_000_000L && scoreHigh <= 9999) scoreHigh * 100_000_000L + scoreLow else null
         val timerMode = game.s8(0x294)
         // The game HUD truncates ticks / 60. Do not extrapolate wall-clock time through pause or slomo.
         val timer = if (timerMode == 1 || timerMode == 2) game.u16(0x296) / 60 else null
-        val mainTable = field < 2
         val saverTicks = game.u16(0x724)
         val flags = main.u8(0x0F)
         var result = PinballSnapshot(
@@ -100,9 +100,10 @@ object PinballReader {
                 else -> "Wait for the on-screen sequence to finish."
             },
         )
-        if (transition != 1) return result.copy(objective = "Wait for the new mode to begin.")
-        // Bonus tables reuse mode/substate IDs with different meanings. Do not apply main-table advice.
+        // Bonus tables do not run the main-board dispatcher: transition can remain zero throughout play.
+        // Their mode/substate IDs have different meanings. Do not apply main-table gates or advice.
         if (!mainTable) return result
+        if (transition != 1) return result.copy(objective = "Wait for the new mode to begin.")
         if (sub !in 0..MAX_SUBSTATE[mode]) return unavailable("Unrecognized mode phase.")
         val advice = when (mode) {
             0 -> "Launch the ball and choose an area." to null
@@ -118,7 +119,11 @@ object PinballReader {
                 4, 5 -> "Travel sequence in progress." to null
                 else -> "Travel mode ending." to null
             }
-            else -> if (sub == 3) "Hit Jirachi to catch it." to hits(game) else "Special encounter sequence in progress." to null
+            else -> when {
+                sub != 3 -> "Special encounter sequence in progress." to null
+                captureStarted(game) -> "Capture animation." to "Hits 3/3"
+                else -> "Hit Jirachi to catch it." to hits(game)
+            }
         }
         result = result.copy(objective = advice.first, progress = advice.second)
         return result
@@ -149,11 +154,13 @@ object PinballReader {
                 hits?.let { "Bumper hits $it/3" }
         }
         in 6..8 -> "Pokémon appearing." to null
-        9 -> if (game.u8(0x5A4) == 2 || game.u8(0x5A5) == 3) "Capture animation." to "Hits 3/3"
+        9 -> if (captureStarted(game)) "Capture animation." to "Hits 3/3"
             else "Hit the Pokémon to catch it." to hits(game)
         // Timeout takes the same ending path as success; do not declare a catch here.
         else -> "Catch mode ending." to null
     }
+
+    private fun captureStarted(game: ByteArray) = game.u8(0x5A4) == 2 || game.u8(0x5A5) == 3
 
     private fun hits(game: ByteArray): String? = game.u8(0x5A5).takeIf { it in 0..3 }?.let { "Hits $it/3" }
 

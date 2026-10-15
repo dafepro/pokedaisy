@@ -1046,7 +1046,7 @@ fun main(args: Array<String>) {
             onAllNodesWithText("SAVE STATES").onFirst().assertExists()
             pressBack()
             onAllNodesWithText("SAVE STATES").assertCountEquals(0)
-            onAllNodesWithText("OPTION").onFirst().assertExists()
+            onAllNodesWithText("SETTINGS").onFirst().assertExists()
         },
         Shot("$g-back-settings-close", bw, bh, bd, companion("SETTINGS")) {
             onNodeWithText("CLOSE GAME").performScrollTo().performSemanticsAction(SemanticsActions.OnClick); pressBack()
@@ -1808,7 +1808,11 @@ fun main(args: Array<String>) {
                 setContent(content)
                 mainClock.advanceTimeBy(500)
                 runCatching { shot.action(this) }
-                    .onFailure { println("${shot.name}: action failed: ${it.message?.lineSequence()?.first()}") }
+                    .onFailure {
+                        failed++
+                        println("${shot.name}: action failed: $it")
+                        it.printStackTrace()
+                    }
                 // Frame by frame, so transitions started by the action run to the end.
                 repeat(90) { mainClock.advanceTimeByFrame() }
                 Thread.sleep(300) // bitmaps load on Dispatchers.IO

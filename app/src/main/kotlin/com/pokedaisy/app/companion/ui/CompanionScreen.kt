@@ -159,7 +159,7 @@ fun CompanionScreen(
         val pinball = snapshot.pinball
         // Until the first real data arrives (the ROM takes a few seconds to
         // boot / be detected) the data tabs show a loading animation.
-        val ready = snapshot.hasData
+        val ready = snapshot.hasData || pinball != null
         var loaded by remember { mutableStateOf(ready) }
         LaunchedEffect(ready) { if (ready) loaded = true }
         // The PARTY tab's open summary (MonDetailScreen), by party index so it

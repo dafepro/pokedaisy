@@ -40,8 +40,8 @@ fun PinballScreen(state: PinballSnapshot, modifier: Modifier = Modifier) {
         }
         OptionListWindow(m, Modifier.fillMaxWidth().weight(1f)) {
             Column(
-                Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(m.u * 4),
-                verticalArrangement = Arrangement.spacedBy(m.u * 5),
+                Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(m.u * 3),
+                verticalArrangement = Arrangement.spacedBy(m.u * 2),
             ) {
                 if (state.tableLabel.isNotBlank()) {
                     GbaText(state.tableLabel, OptionColors.label, OptionColors.labelShadow, small,
@@ -53,7 +53,7 @@ fun PinballScreen(state: PinballSnapshot, modifier: Modifier = Modifier) {
                     state.objective,
                     OptionColors.label, OptionColors.labelShadow, m,
                     modifier = Modifier.fillMaxWidth().background(OptionColors.rowSelected)
-                        .padding(m.u * 6).testTag("pinball-objective"),
+                        .padding(m.u * 4).testTag("pinball-objective"),
                     maxLines = Int.MAX_VALUE,
                 )
                 // A menu or unsupported snapshot must not display stale play counters.
@@ -64,15 +64,28 @@ fun PinballScreen(state: PinballSnapshot, modifier: Modifier = Modifier) {
                     state.progress?.takeIf { it.isNotBlank() }?.let {
                         PinballValue(tr("PROGRESS"), it, small, "pinball-progress")
                     }
-                    state.ballSaverSeconds?.let { seconds ->
-                        PinballValue(tr("BALL SAVER"), if (seconds > 0) "${seconds}s" else tr("OFF"), small, "pinball-saver")
+                    if (state.ballSaverSeconds != null || state.ball != null) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(m.u * 6)) {
+                            state.ballSaverSeconds?.let { seconds ->
+                                PinballValue(tr("BALL SAVER"), if (seconds > 0) "${seconds}s" else tr("OFF"),
+                                    small, "pinball-saver", Modifier.weight(1f))
+                            }
+                            state.ball?.let {
+                                PinballValue(tr("BALLS LEFT"), it.toString(), small, "pinball-balls", Modifier.weight(1f))
+                            }
+                        }
                     }
-                    state.ball?.let { PinballValue(tr("BALLS LEFT"), it.toString(), small, "pinball-balls") }
-                    state.score?.let {
-                        PinballValue(tr("SCORE"), NumberFormat.getIntegerInstance(Locale.US).format(it), small, "pinball-score")
-                    }
-                    state.areaLabel?.takeIf { it.isNotBlank() }?.let {
-                        PinballValue(tr("AREA"), it, small, "pinball-area")
+                    val area = state.areaLabel?.takeIf { it.isNotBlank() }
+                    if (state.score != null || area != null) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(m.u * 6)) {
+                            state.score?.let {
+                                PinballValue(tr("SCORE"), NumberFormat.getIntegerInstance(Locale.US).format(it),
+                                    small, "pinball-score", Modifier.weight(1f))
+                            }
+                            area?.let {
+                                PinballValue(tr("AREA"), it, small, "pinball-area", Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
                 state.detail?.takeIf { it.isNotBlank() }?.let {
@@ -81,22 +94,19 @@ fun PinballScreen(state: PinballSnapshot, modifier: Modifier = Modifier) {
                 }
             }
         }
-        // Persistent but separate from the live objective. These reads are source-mapped,
-        // and synthetic UI previews do not constitute validation against a running game.
-        OptionListWindow(small, Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(horizontal = m.u * 4)) {
-                GbaText(tr("EXPERIMENTAL"), OptionColors.label, OptionColors.labelShadow, small)
-                GbaText(tr("Source-mapped; gameplay not validated."), OptionColors.label,
-                    OptionColors.labelShadow, small, maxLines = 2)
-            }
+        // Basic play checked headlessly; advanced modes and Android integration need validation.
+        // Synthetic UI previews do not constitute validation against a running game.
+        OptionListWindow(small, Modifier.fillMaxWidth().testTag("pinball-experimental")) {
+            GbaText(tr("EXPERIMENTAL: limited gameplay validation."), OptionColors.label,
+                OptionColors.labelShadow, small, Modifier.padding(horizontal = m.u * 4), maxLines = 2)
         }
     }
 }
 
 /** Non-interactive LABEL / VALUE rows, with wrapping instead of clipped counters. */
 @Composable
-private fun PinballValue(label: String, value: String, m: GbaTextMetrics, tag: String) {
-    Row(Modifier.fillMaxWidth().testTag(tag), verticalAlignment = Alignment.Top,
+private fun PinballValue(label: String, value: String, m: GbaTextMetrics, tag: String, modifier: Modifier = Modifier) {
+    Row(modifier.fillMaxWidth().testTag(tag), verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(m.u * 6)) {
         GbaText(label, OptionColors.label, OptionColors.labelShadow, m,
             Modifier.weight(0.46f), maxLines = 2)

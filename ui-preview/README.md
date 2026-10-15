@@ -18,7 +18,21 @@ gradle render -Plang=DE          # the app's text in another language (JA FR DE 
 gradle render -Pgame=EMERALD -Prom=/path/pokeemerald.gba   # + the GUIDE's live pages
 gradle render -Pgame=EMERALD -PgameText=EMERALD_LEGACY -Prom=/path/legacy.gba   # Emerald Legacy (its own save fixture)
 gradle render -PcompanionW=960 -PcompanionH=1080   # the companion as a single-screen side panel
+gradle :data:test test            # synthetic Pinball reader + website compatibility parity
+gradle render -Ponly=pinball      # synthetic Pinball UI, navigation, and three device sizes
+gradle render -Ponly=pinball -Pdark=true -Pout=build/pinball-dark
 ```
+
+The Pinball tests and screenshots use synthetic data, not a ROM or captured gameplay.
+They check the reader's bounds and state transitions, the actual Compose layout, and
+repeated SETTINGS / STATES / BACK navigation. They do not establish live-ROM or Android-device correctness.
+The root `test` task also verifies that the website's checked-in compatibility data
+matches the app's tables. Neither test task needs an Android SDK.
+
+In a cloud sandbox where the JVM's home directory is read-only, Skiko needs a writable
+cache location. Create a local directory and set `JAVA_TOOL_OPTIONS="-Duser.home=/absolute/path/to/java-home"`
+before running Gradle; this applies to the renderer's child JVM as well. A writable
+`XDG_CACHE_HOME` directory also lets native Fontconfig cache its font lookup results.
 
 `-Prom` points the GUIDE's live pages (HERE's wild list, NEXT BOSS) at a ROM
 byte-identical to retail FireRed rev 1 / Emerald - e.g. the pinned decomp built
@@ -90,3 +104,23 @@ step, so a miss prints `action failed`.
   device is still the final word.
 - If the compiler reports "Unresolved reference" for something that plainly
   exists, delete `build/kotlin` (stale incremental cache — happened once).
+
+### Private Pinball RAM captures
+
+With a user-owned exact supported ROM and `native-capture/mgba_dump` captures,
+run the production decoder against real RAM without Android:
+
+```sh
+gradle -p ui-preview :data:pinballCapture \
+  -Prom=/private/PokemonPinball.gba -Pcaptures=/private/pinball-captures
+```
+
+The capture directory contains named subdirectories, each with a complete
+`ewram.bin`. The tool verifies the raw ROM SHA-1 before decoding. An optional
+`expected.tsv` in the capture directory asserts three tab-separated columns:
+`capture-folder`, `field`, `expected-value`. Fields are `phase`, `table`, `mode`,
+`timer`, `saver`, `balls`, `score`, `area`, `progress`, and `objective`; absent
+values use literal `null`. Author expectations from independent game-screen
+observations, not by copying the decoder output. Keep the ROM, RAM, saves and
+frames outside this repository. This tool does not demonstrate Android/JNI or
+on-device UI integration by itself.

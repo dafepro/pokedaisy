@@ -80,7 +80,7 @@ class TelemetryStore {
         val c = cached
         if (c != null) {
             // Live replaces the saved copy once it has data (or won't get any); until then the copy stays.
-            if (s.hasData || s.unsupported || ++cachedSamples > CACHED_MAX_SAMPLES) {
+            if (s.hasData || s.pinball != null || s.unsupported || ++cachedSamples > CACHED_MAX_SAMPLES) {
                 cached = null
                 // Icons the copy couldn't read yet (the core wasn't up) can load now.
                 DecompIconSource.iconsChanged()

@@ -96,11 +96,16 @@ class PinballReaderTest {
     }
     @Test fun bonusTablesNeverUseMainTableModesOrSaver() {
         for (field in 2..7) {
-            val f = Fixture().apply { main[4] = field.toByte(); mode(4, 5); byte(0x625, 3); word(0x724, 300) }
+            val f = Fixture().apply { main[4] = field.toByte(); mode(4, 5); byte(0x16, 0); byte(0x625, 3); word(0x724, 300) }
             val s = f.sample()
             assertEquals("BONUS STAGE", s.modeLabel); assertNull(s.progress); assertNull(s.ballSaverSeconds)
             assertNull(s.ball); assertNull(s.areaLabel); assertTrue(s.objective.contains("bonus stage"))
         }
+    }
+    @Test fun bonusBoardDoesNotInterpretUnusedMainBoardStateFields() {
+        val f = Fixture().apply { main[4] = 2; mode(-1, -1); byte(0x16, -1) }
+        assertEquals(PinballPhase.PLAYING, f.sample().phase)
+        assertTrue(f.sample().objective.contains("bonus stage"))
     }
     @Test fun timerMatchesGameTruncationAndDoesNotExtrapolate() {
         val f = Fixture().apply { byte(0x294, 2) }
@@ -168,6 +173,13 @@ class PinballReaderTest {
         f.byte(0x5A5, 3); assertEquals("Capture animation.", f.sample().objective)
         f.byte(0x5A5, 0); f.byte(0x5A4, 2); assertEquals("Hits 3/3", f.sample().progress)
     }
+    @Test fun specialEncounterStopsCoachingHitsDuringItsCaptureCutscene() {
+        val f = Fixture().apply { mode(8, 3); byte(0x5A5, 2) }
+        assertEquals("Hit Jirachi to catch it.", f.sample().objective)
+        f.byte(0x5A5, 3); assertEquals("Capture animation.", f.sample().objective)
+        f.byte(0x5A5, 0); f.byte(0x5A4, 2)
+        assertEquals("Capture animation.", f.sample().objective); assertEquals("Hits 3/3", f.sample().progress)
+    }
     @Test fun catchEndingIsNotAssumedSuccessful() {
         val f = Fixture().apply { byte(0x5A5, 3) }
         for (sub in 10..12) { f.mode(4, sub); assertEquals("Catch mode ending.", f.sample().objective); assertNull(f.sample().progress) }
@@ -204,4 +216,18 @@ class PinballReaderTest {
         f.pointer = 0
         val s = f.sample(); assertEquals(PinballPhase.UNAVAILABLE, s.phase); assertNull(s.timerSeconds); assertNull(s.progress)
     }
+    @Test fun pinballDoesNotEnterTheRpgSnapshotCacheOrHudReadiness() {
+        val dir = java.nio.file.Files.createTempDirectory("pinball-cache-test").toFile()
+        try {
+            val state = java.io.File(dir, "slot")
+            val stale = SnapshotCache.fileFor(state)
+            stale.writeText("stale RPG companion data")
+            val view = SnapshotView(connected = true, pinball = Fixture().sample())
+            assertFalse(view.hasData)
+            SnapshotCache.write(state, view)
+            assertFalse(stale.exists())
+            assertNull(SnapshotCache.read(state))
+        } finally { dir.deleteRecursively() }
+    }
+
 }

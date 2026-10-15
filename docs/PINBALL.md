@@ -23,18 +23,35 @@ it does not replace physics, draw over the ball, inject inputs, or change saves.
   suppress stale coaching. A timed-out mode is never declared successful.
 - Synthetic decoder tests and an art-free Compose UI preview path.
 
-The persistent EXPERIMENTAL notice is intentional. Source interpretation and
-synthetic fixtures are not live gameplay validation.
+The persistent EXPERIMENTAL notice is intentional. Basic gameplay is checked
+headlessly with a user-supplied ROM. Advanced-mode guidance is source-mapped
+and synthetically tested; it has not yet been verified in real gameplay.
 
 ## Verification status
 
-At the initial source checkpoint, cloud compilation and synthetic tests are
-being run. No Android APK build, Android hardware test, live Pinball ROM run,
-performance measurement or real-RAM capture has been completed. No ROM was
-available. See subsequent commits for completed cloud verification results.
+Cloud verification on 2026-10-15:
 
-Tests are authored byte arrays, not captured ROM/RAM/save data. Preview images
-are synthetic UI scenarios, not screenshots of gameplay. No game art, ROM,
+- 30 synthetic `PinballReaderTest` cases pass, including exact identity, menu/demo
+  exclusion, invalid/short reads, mode/substate boundaries, Catch/Evolution
+  progression, timers, saver, extra-life representation and stale-cache cleanup.
+- All 3 `SiteDataExportTest` cases pass; the app and website agree on support.
+- All 26 website/manual tests pass, all translation entries pass validation,
+  and the website builds 29 static pages. Nothing was deployed.
+- The actual Compose UI compiles against the existing Desktop Android shims.
+  Multi-size light/dark renders and navigation assertions are being verified.
+- The exact user-supplied ROM runs in pinned mGBA `26b7884`. The production
+  Kotlin reader passes 128 assertions against 22 private real-RAM captures:
+  both tables' boot/title/menu/selection, launch, ordinary play, pause and
+  resume, score, balls, area and saver countdown. No memory injection was used.
+  Pause froze the saver at 3,418 ticks across 120 frames, then resume advanced
+  it to 3,386. The original game screens were privately inspected.
+
+No Android APK build, Android hardware test or performance measurement has
+been completed. Cloud Desktop renders do not establish Android/JNI integration.
+
+Committed unit tests are authored byte arrays, not captured ROM/RAM/save data.
+The optional private capture checker reads user-owned files outside the repo.
+Compose preview images are synthetic UI scenarios, not screenshots of gameplay. No game art, ROM,
 save-state or copyrighted ROM dump is added to this repository.
 
 ### Required real-game validation
@@ -80,7 +97,8 @@ restored at launch.
 
 ## Next slices, deliberately not claimed as implemented
 
-1. Validate and refine this slice with a user-supplied ROM and real captures.
+1. Extend real-game validation to Catch, Evolution, timeouts, extra balls, bonus
+   stages and rewind, then verify the integrated companion on Android.
 2. Current-area missing catches and Evolution planning, using the game's actual
    encounter/eligibility rules; never predict a not-yet-selected encounter.
 3. Illustrated table rules reconstructed from the player's ROM, with an

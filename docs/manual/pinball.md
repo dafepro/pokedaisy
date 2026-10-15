@@ -26,9 +26,10 @@ The companion only reads the unmodified English `BPPE` revision `0` ROM whose
 SHA-1 is `9fec81ce2c5df589e0371a0bf2f92a5fe8db730b`. Other versions still play,
 but this experimental reader does not use their memory.
 
-The `EXPERIMENTAL` notice means the reader was mapped from public source and
-checked with synthetic examples. It has not yet been verified against a
-user-supplied running game or on Android hardware.
+The `EXPERIMENTAL` notice means testing is still limited. Basic play on both
+tables has been checked with a user-supplied running game in the cloud. Catch
+and Evolution guidance currently rely on public source and synthetic tests.
+The integrated companion has not yet been tested on Android hardware.
 
 ## Practice and what comes next
 

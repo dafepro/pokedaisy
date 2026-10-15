@@ -207,7 +207,7 @@ data class SnapshotView(
 
 /** The game's data is in (not just detected): the save's party or the map. */
 val SnapshotView.hasData: Boolean
-    get() = connected && (pinball != null || game != null && (party.isNotEmpty() || location.mapSecName.isNotEmpty()))
+    get() = connected && game != null && (party.isNotEmpty() || location.mapSecName.isNotEmpty())
 
 /** This battler's moves with their effectiveness against [foe] instead of the
  * foe that's out (BATTLE INFO showing another of the trainer's Pokémon). */

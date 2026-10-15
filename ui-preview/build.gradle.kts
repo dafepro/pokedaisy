@@ -29,11 +29,18 @@ val prepSrc = tasks.register<Sync>("prepSrc") {
 }
 sourceSets["main"].kotlin.srcDir("src/render")
 sourceSets["main"].kotlin.srcDir("src/shims")
-tasks.withType<KotlinCompile>().configureEach {
+sourceSets["test"].kotlin.apply {
+    srcDir(rootDir.resolve("../app/src/test/kotlin"))
+    include("**/SiteDataExportTest.kt")
+}
+tasks.named<KotlinCompile>("compileKotlin") {
     source(files(layout.buildDirectory.dir("appsrc")).builtBy(prepSrc))
+}
+tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = "17"
 }
 java { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
+tasks.test { workingDir = rootDir.parentFile }
 
 dependencies {
     implementation(project(":data"))
@@ -44,6 +51,7 @@ dependencies {
     implementation("org.apache.commons:commons-compress:1.28.0")
     implementation("org.tukaani:xz:1.12")
     implementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.5.12")
+    testImplementation("junit:junit:4.13.2")
 }
 
 tasks.register<JavaExec>("render") {

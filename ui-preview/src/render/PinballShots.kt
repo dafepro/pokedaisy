@@ -46,58 +46,74 @@ fun pinballShots(): List<Shot> = buildList {
         add(Shot("pinball-synthetic-back-navigation-${device.name}", device.w, device.h, device.density,
             pinballCompanion(syntheticPinballStates.getValue("catch"))) {
             assertPinball(syntheticPinballStates.getValue("catch"))
-            repeat(4) {
+            repeat(4) { round ->
+                println("pinball navigation ${device.name} round $round: open Settings")
                 onNodeWithContentDescription("Settings").performClick()
                 settlePinball()
-                onAllNodesWithText("OPTION").onFirst().assertExists()
+                onAllNodesWithText("SETTINGS").onFirst().assertExists()
+                println("pinball navigation ${device.name} round $round: open FF speed")
                 onNodeWithText("FF SPEED").performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
                 settlePinball()
                 onAllNodesWithText("INFINITE").onFirst().assertExists()
+                println("pinball navigation ${device.name} round $round: close FF speed")
                 pressBack()
                 settlePinball()
                 onAllNodesWithText("INFINITE").assertCountEquals(0)
-                onAllNodesWithText("OPTION").onFirst().assertExists()
+                onAllNodesWithText("SETTINGS").onFirst().assertExists()
+                println("pinball navigation ${device.name} round $round: open Hotkeys")
                 onNodeWithText("HOTKEYS").performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
                 settlePinball()
                 onAllNodesWithText("SAVE STATE").onFirst().assertExists()
+                println("pinball navigation ${device.name} round $round: close Hotkeys")
                 pressBack()
                 settlePinball()
                 onAllNodesWithText("SAVE STATE").assertCountEquals(0)
-                onAllNodesWithText("OPTION").onFirst().assertExists()
+                onAllNodesWithText("SETTINGS").onFirst().assertExists()
+                println("pinball navigation ${device.name} round $round: Settings Back")
                 pressBack()
                 settlePinball()
-                onAllNodesWithText("OPTION").onFirst().assertExists()
+                onAllNodesWithText("SETTINGS").onFirst().assertExists()
+                println("pinball navigation ${device.name} round $round: open States")
                 onNodeWithTag("tab-STATES").performClick()
                 settlePinball()
                 onAllNodesWithText("SAVE STATES").onFirst().assertExists()
+                println("pinball navigation ${device.name} round $round: States Back")
                 pressBack()
                 settlePinball()
                 onAllNodesWithText("SAVE STATES").onFirst().assertExists()
+                println("pinball navigation ${device.name} round $round: return to Pinball")
                 onNodeWithTag("tab-PINBALL").performClick()
                 settlePinball()
                 assertPinball(syntheticPinballStates.getValue("catch"))
+                println("pinball navigation ${device.name} round $round: passed")
             }
         })
         // Repeated samples must not pull the user out of SETTINGS or STATES.
         val sampled = mutableStateOf(syntheticPinballStates.getValue("catch"))
         add(Shot("pinball-synthetic-sampling-navigation-${device.name}", device.w, device.h, device.density,
             pinballCompanion { sampled.value }) {
-            repeat(4) {
+            repeat(4) { round ->
+                println("pinball sampling ${device.name} round $round: open Settings")
                 onNodeWithContentDescription("Settings").performClick()
                 settlePinball()
+                println("pinball sampling ${device.name} round $round: sample Evolution")
                 runOnIdle { sampled.value = syntheticPinballStates.getValue("evolution") }
                 settlePinball()
-                onAllNodesWithText("OPTION").onFirst().assertExists()
+                onAllNodesWithText("SETTINGS").onFirst().assertExists()
                 onNodeWithTag("pinball-panel").assertDoesNotExist()
+                println("pinball sampling ${device.name} round $round: open States")
                 onNodeWithTag("tab-STATES").performClick()
                 settlePinball()
+                println("pinball sampling ${device.name} round $round: sample Free Play")
                 runOnIdle { sampled.value = syntheticPinballStates.getValue("normal") }
                 settlePinball()
                 onAllNodesWithText("SAVE STATES").onFirst().assertExists()
                 onNodeWithTag("pinball-panel").assertDoesNotExist()
+                println("pinball sampling ${device.name} round $round: return to Pinball")
                 onNodeWithTag("tab-PINBALL").performClick()
                 settlePinball()
                 assertPinball(syntheticPinballStates.getValue("normal"))
+                println("pinball sampling ${device.name} round $round: passed")
             }
         })
     }
@@ -108,36 +124,37 @@ private data class PinballDevice(val name: String, val w: Int, val h: Int, val d
 private val syntheticCatch = PinballSnapshot(
     phase = PinballPhase.PLAYING,
     tableLabel = "SYNTHETIC / RUBY TABLE",
-    modeLabel = "CATCH MODE",
+    modeLabel = "CATCH",
     timerSeconds = 57,
-    objective = "Hit the target to catch EMBERPUP.",
-    progress = "Target hits: 1 / 3",
+    objective = "Hit the Pokémon to catch it.",
+    progress = "Hits 1/3",
     ballSaverSeconds = 9,
     ball = 3,
     score = 12_345_670L,
-    areaLabel = "MEADOW",
+    areaLabel = "Forest",
 )
 
 private val syntheticPinballStates = linkedMapOf(
     "catch" to syntheticCatch,
     "evolution" to syntheticCatch.copy(
-        tableLabel = "SYNTHETIC / SAPPHIRE TABLE", modeLabel = "EVOLUTION MODE",
-        timerSeconds = 78, objective = "Collect the last evolution item.",
-        progress = "Items: 2 / 3", ballSaverSeconds = 0, ball = 2,
+        tableLabel = "SYNTHETIC / SAPPHIRE TABLE", modeLabel = "EVOLVE",
+        timerSeconds = 78, objective = "Collect the evolution item.",
+        progress = "Items 2/3", ballSaverSeconds = 0, ball = 2,
     ),
     "normal" to syntheticCatch.copy(
-        modeLabel = "NORMAL PLAY", timerSeconds = null,
-        objective = "Keep the ball in play.", progress = "Catch charge: 1 / 3", ballSaverSeconds = null,
+        modeLabel = "FREE PLAY", timerSeconds = null,
+        objective = "Catch and Evolution ready. Choose a mode.", progress = "Bonus progress 2/3", ballSaverSeconds = null,
     ),
     // Deliberately retain invalid/stale counters. The UI must hide ALL of them.
     "menu" to syntheticCatch.copy(
         phase = PinballPhase.MENU, modeLabel = "MENU",
-        objective = "Start a game on either table.", detail = "Synthetic menu data; not a gameplay capture.",
+        objective = "Start or resume a game on either table.",
+        detail = "Live objectives appear during your game. Menus and demo play are excluded.",
     ),
     "unavailable" to syntheticCatch.copy(
-        phase = PinballPhase.UNAVAILABLE, modeLabel = "UNAVAILABLE",
-        objective = "Companion data is unavailable.",
-        detail = "Synthetic invalid read; waiting for a supported screen.",
+        phase = PinballPhase.UNAVAILABLE, modeLabel = "WAITING",
+        objective = "Follow the game screen while live guidance is unavailable.",
+        detail = "Unrecognized mode phase.",
     ),
 )
 
@@ -173,12 +190,12 @@ private fun pinballCompanion(state: () -> PinballSnapshot): () -> (@Composable (
 
 private fun SkikoComposeUiTest.settlePinball() {
     repeat(20) { mainClock.advanceTimeByFrame() }
-    waitForIdle()
 }
 
 private fun SkikoComposeUiTest.assertPinball(state: PinballSnapshot) {
     onNodeWithTag("pinball-panel").assertIsDisplayed()
     onNodeWithTag("pinball-objective").assertIsDisplayed()
+    onNodeWithTag("pinball-experimental").assertIsDisplayed()
     onAllNodesWithText(state.tableLabel).onFirst().assertExists()
     onAllNodesWithText(state.modeLabel).onFirst().assertExists()
     onAllNodesWithText(state.objective).onFirst().assertExists()
@@ -198,6 +215,9 @@ private fun SkikoComposeUiTest.assertPinball(state: PinballSnapshot) {
     if (state.phase == PinballPhase.PLAYING) {
         onAllNodesWithText("BALLS LEFT").onFirst().assertExists()
         onAllNodesWithText("12,345,670").onFirst().assertExists()
+        onNodeWithTag("pinball-balls").assertIsDisplayed()
+        onNodeWithTag("pinball-score").assertIsDisplayed()
+        onNodeWithTag("pinball-area").assertIsDisplayed()
         if (state.ballSaverSeconds == null) onNodeWithTag("pinball-saver").assertDoesNotExist()
     }
 }

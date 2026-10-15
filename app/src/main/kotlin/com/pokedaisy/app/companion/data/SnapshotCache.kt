@@ -36,7 +36,8 @@ object SnapshotCache {
     /** Writes [v] beside [state], or removes a stale one when [v] has no data worth showing. */
     fun write(state: File, v: SnapshotView?) {
         val f = fileFor(state)
-        val bytes = v?.takeIf { it.hasData && !it.unsupported }?.let { encode(it) }
+        // This cache serializes RPG game kinds only. Pinball waits for a fresh read after a load.
+        val bytes = v?.takeIf { it.game != null && it.pinball == null && it.hasData && !it.unsupported }?.let { encode(it) }
         runCatching {
             if (bytes == null) {
                 f.delete()
