@@ -37,6 +37,9 @@ object CompanionSupport {
         // Game Boy / Color: the exact carts the GB reader knows (Pokémon Yellow).
         if (RomIdentity.isGameBoy(rom)) return TelemetrySampler.GAME_BOY_SUPPORT && RomIdentity.sha1(rom) in TelemetrySampler.SUPPORTED_GB_SHA1S
         val code = RomIdentity.gameCode(rom) ?: return false
+        if (code.startsWith("BPP")) return com.pokedaisy.app.companion.data.PinballRsProfile.matches(
+            code, RomIdentity.revision(rom) ?: -1, RomIdentity.sha1(rom),
+        )
         val size = RomArchive.romSize(rom)
         if (code in TelemetrySampler.OTHER_RETAIL_CODES) {
             // Retail only, and only the revisions detect() has addresses for.

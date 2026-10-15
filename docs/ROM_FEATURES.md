@@ -182,3 +182,10 @@ change to any of the places listed under "Where it's decided" updates its rows h
   headless, as `unbound_battle`'s README describes).
 - The POKéMON switch for English LeafGreen and FireRed rev 0.
 - Battle buttons for Emerald Rogue; the POKéMON switch for Ruby / Sapphire (their party cursor lives in a sprite).
+
+## Experimental Pinball companion in this fork
+
+Pokémon Pinball: Ruby & Sapphire, exact English BPPE revision 0, has a separate
+read-only objective panel. RPG-specific features in the matrix above do not
+apply. No EXPAND/full-table rendering, battle input, field editing or trainer
+card is enabled for it. See [PINBALL.md](PINBALL.md) for evidence and limits.

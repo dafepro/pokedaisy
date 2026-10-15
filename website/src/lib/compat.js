@@ -49,6 +49,14 @@ export function verdict(data, { platform, code, rev, size, sha1, retailOf }) {
   }
   if (platform !== 'gba') return { status: 'unsupported', reason: 'not-a-rom' };
 
+  // Pinball has its own memory layout. Never accept a header-only or other-region match.
+  if (code?.startsWith('BPP')) {
+    const p = data.pinball;
+    return p && code === p.code && rev === p.rev && sha1 === p.sha1
+      ? { status: 'supported', title: p.title, version: 'Experimental companion' }
+      : { status: 'unsupported', reason: 'other-game' };
+  }
+
   const retail = data.retail.find((r) => r.code === code);
   if (retail) {
     if (size > data.maxBaseSize) return { status: 'unsupported', reason: 'retail-hack', base: retail.title };

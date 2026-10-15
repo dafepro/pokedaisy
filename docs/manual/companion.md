@@ -108,3 +108,9 @@ On a device with two screens there's also `CLOSE COMPANION`. It hands the bottom
 
 > [!TIP]
 > Not sure what a row does? `HELP`, the last row of SETTINGS, opens this manual right on the bottom screen.
+
+## Pinball in this fork
+
+The experimental [Pinball companion](pinball.md) replaces the RPG tabs with
+`PINBALL`, `STATES` and `SETTINGS` for its exact supported ROM. Achievements
+remain available when connected.

@@ -127,3 +127,14 @@ test('a retail dump with its end trimmed and its save code patched reads as reta
   assert.equal((await checkFile(fake, 'mod.gba', modded)).verdict.reason, 'unknown-hack');
   assert.equal(await retailDumpOf(fake, readHeader(patched), patched.slice(0, end - 1)), null);
 });
+
+
+test('Pinball requires exact SHA-1, header and revision', () => {
+  const sha1 = '9fec81ce2c5df589e0371a0bf2f92a5fe8db730b';
+  assert.deepEqual(v('BPPE', 0, 16 * MB, sha1), {
+    status: 'supported', title: 'Pokémon Pinball: Ruby & Sapphire', version: 'Experimental companion',
+  });
+  assert.equal(v('BPPE', 0, 16 * MB).status, 'unsupported');
+  assert.equal(v('BPPE', 1, 16 * MB, sha1).status, 'unsupported');
+  assert.equal(v('BPPJ', 0, 16 * MB, sha1).status, 'unsupported');
+});

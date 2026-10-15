@@ -156,6 +156,7 @@ fun CompanionScreen(
         LocalGameFontWidth provides if (gameFont != null) gameFontWidth(snapshot.game) else 1f,
     ) { AppTheme { key(snapshot.game) {
         val game = snapshot.game
+        val pinball = snapshot.pinball
         // Until the first real data arrives (the ROM takes a few seconds to
         // boot / be detected) the data tabs show a loading animation.
         val ready = snapshot.hasData
@@ -219,7 +220,7 @@ fun CompanionScreen(
         // Tabs this game has: DEX needs the ROM's dex tables, GUIDE a guide or evolutions.
         // The launch's saved copy names the ones it had, which wait on LOADING for the live data.
         val cachedTabs = snapshot.cachedTabs.orEmpty()
-        val available = COMPANION_TABS.filter { id ->
+        val available = if (pinball != null) listOfNotNull("PINBALL", "STATES", "ACHIEVEMENTS".takeIf { achievements != null }) else COMPANION_TABS.filter { id ->
             when (id) {
                 "DEX" -> dex != null || id in cachedTabs
                 "GUIDE" -> guide != null || id in cachedTabs
@@ -233,7 +234,7 @@ fun CompanionScreen(
         // every game, so one with more of the chosen tabs can overflow too.)
         // No BATTLE tab for a battle that read nothing (a game whose battle memory isn't mapped).
         val battle = snapshot.showsBattle
-        val chosen = available.filter { it in chosenTabs }
+        val chosen = if (pinball != null) available else available.filter { it in chosenTabs }
         val bar = chosen.take(if (battle) MAX_BAR_TABS - 1 else MAX_BAR_TABS)
         val tabs = buildList {
             if (battle) add("BATTLE")
@@ -471,6 +472,8 @@ fun CompanionScreen(
                         } else if (tab == "CARD" && card != null && cardArt?.style == card.style) {
                             // The game's own card fills the tab, over the backdrop.
                             TrainerCardScreen(card, cardArt, Modifier.fillMaxSize(), initialBack = initialCardBack)
+                        } else if (tab == "PINBALL" && pinball != null) {
+                            PinballScreen(pinball, Modifier.fillMaxSize())
                         } else if (tab == "MAP") {
                             MapScreen(snapshot, modifier = Modifier.fillMaxSize(), fly = fly)
                         } else if (tab == "PARTY") {

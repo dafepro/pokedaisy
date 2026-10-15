@@ -17,6 +17,7 @@ class TelemetrySampler {
     }
 
     private var kind: GameKind? = null
+    private var pinballDetected = false
     private var nativeCfg: NativeConfig? = null
         set(v) {
             field = v
@@ -243,7 +244,7 @@ class TelemetrySampler {
         val s = sampleUntagged(reader)
         // An unsupported ROM has no game look to borrow - the app's own backdrop.
         return s.copy(
-            game = if (s.unsupported) null else kind ?: if (s.connected) activeGame else null,
+            game = if (s.unsupported || s.pinball != null) null else kind ?: if (s.connected) activeGame else null,
             bestEffort = beMatch?.let { m ->
                 BestEffortView(
                     m.candidate.title, m.full, m.off, beFresh,
@@ -272,7 +273,7 @@ class TelemetrySampler {
 
     private fun sampleUntagged(reader: MemoryReader): SnapshotView {
         try {
-            if (kind == null) detect(reader)
+            if (kind == null && !pinballDetected) detect(reader)
             if (beCode != null) {
                 takeAnswers(reader)
                 runBestEffort(reader)
@@ -297,6 +298,8 @@ class TelemetrySampler {
             // Quetzal picks each kind of name's language from its own options (a few bytes a sample).
             quetzalNames = nativeCfg?.takeIf { it.quetzalPlacesDefault >= 0 }
                 ?.let { runCatching { readQuetzalNames(reader, it) }.getOrNull() } ?: QuetzalNames()
+
+            if (pinballDetected) return SnapshotView(connected = true, pinball = PinballReader.read(reader))
 
             val telemetry = when (kind) {
                 // English Unbound leaves nativeCfg null (see detect()); its French translation sets its own.
@@ -337,6 +340,24 @@ class TelemetrySampler {
         if (runCatching { MgbaCore.pkPlatform() }.getOrDefault(0) == 1) return detectGameBoy()
         val code = runCatching { MgbaCore.pkRomCode() }.getOrNull().orEmpty()
         val size = runCatching { MgbaCore.pkRomSize() }.getOrDefault(0L)
+
+        // Pinball has unrelated RAM. Require the exact profile before reading any gameplay fields.
+        if (code.startsWith("BPP")) {
+            val revision = runCatching { reader.readCoreMemory(0x080000BCL, 1)[0].toInt() and 0xFF }.getOrDefault(-1)
+            val hash = if (size in 0xC0L..0x2000000L) runCatching { PinballRsProfile.sha1(reader, size) }.getOrNull() else null
+            pinballDetected = PinballRsProfile.matches(code, revision, hash)
+            if (pinballDetected) {
+                nativeCfg = null // clear a previous game's process-global native configuration
+                DecompIconSource.tables = IconTables()
+                PokedexSource.romChanged()
+                com.pokedaisy.app.companion.i18n.L10n.applyGameLanguage('E')
+            }
+            if (!pinballDetected) {
+                kind = GameKind.FIRERED // marks detection complete; unsupported UI has no game theme
+                unsupportedRom(reader, code, size, hash, "Pinball companion needs the exact English BPPE revision 0 ROM. Other builds are not mapped.")
+            }
+            return
+        }
 
         // LeafGreen / Ruby / Sapphire / the other Emeralds: retail only, read
         // natively straight away. LeafGreen looks like FireRed, the rest like

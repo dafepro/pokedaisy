@@ -2,6 +2,7 @@
   "_generated": "by app/src/test/kotlin/com/pokedaisy/app/SiteDataExportTest.kt - don't edit by hand",
   "maxBaseSize": 16777216,
   "baseCodes": {"BPRE": "Pokémon FireRed", "BPEE": "Pokémon Emerald"},
+  "pinball": {"code": "BPPE", "rev": 0, "sha1": "9fec81ce2c5df589e0371a0bf2f92a5fe8db730b", "title": "Pokémon Pinball: Ruby & Sapphire"},
   "hackCodes": {"PUVV": "Pokémon FireRed"},
   "retail": [
     {"code": "AXPD", "revs": [0, 1], "title": "Pokémon Saphir-Edition"},

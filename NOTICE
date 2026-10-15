@@ -73,6 +73,11 @@ The app shows every license below in full under Settings > LICENSES.
   picture decompressor, expansion's "smol" decompressor and the trainer card's
   layout are re-implemented from them in Kotlin.
 
+- Pinball companion memory offsets and state meanings were researched against
+  pret/pokepinballrs (https://github.com/pret/pokepinballrs), commit
+  33ad42e8f2afca891831f03179820b96a3fdef6a. The decoder is independently written;
+  no game code, ROM or art from that project is bundled. See docs/PINBALL.md.
+
 GAMES AND TRADEMARKS
 
 Pokemon and all related names are trademarks of Nintendo, Game Freak,

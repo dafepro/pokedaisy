@@ -34,8 +34,11 @@ object NewFeatures {
     /** SETTINGS > SINGLE SCREEN: a two-screen device played on one, the companion over the game. */
     const val SINGLE_SCREEN = "single_screen"
 
+    /** Read-only Pinball objective companion. */
+    const val PINBALL = "pinball"
+
     /** Every feature that gets the tag. */
-    val ALL = listOf(HUD, BATTLE_BUTTONS, GAME_HOTKEYS, COMPANION_WINDOW, HUD_PC, QUICK_MENU, HUD_REPEL, SINGLE_SCREEN)
+    val ALL = listOf(HUD, BATTLE_BUTTONS, GAME_HOTKEYS, COMPANION_WINDOW, HUD_PC, QUICK_MENU, HUD_REPEL, SINGLE_SCREEN, PINBALL)
 
     private const val DAYS = 7
     private const val DAY_MS = 24 * 60 * 60 * 1000L

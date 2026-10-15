@@ -26,6 +26,20 @@ and popular ROM hacks of every generation. The game runs on the top screen. The
 bottom screen is a live companion that reads your game as you play: your party, your bag, the map, battle matchups, your Pokedex, and a
 spoiler-free guide. Everything is drawn in the game's own menu style.
 
+## Pinball modernization fork
+
+Based on PokeDaisy by Lidor Itzhari - https://github.com/lidor30/pokedaisy
+
+This fork adds an experimental, read-only **Pokémon Pinball: Ruby & Sapphire**
+companion: current objective, mode timer/progress, saver and run status, with the
+original physics and game screen unchanged. Only exact English BPPE revision 0
+is mapped. This is **source-mapped work in progress with synthetic tests**, not
+a gameplay-validated release. No games or game art are included.
+
+See [implementation, evidence and limits](docs/PINBALL.md) and the
+[Pinball manual](docs/manual/pinball.md). Collection planning, practice scenarios,
+post-run results and full-table rendering remain later work.
+
 ## Devices
 
 | Device                    | Status                                                         |

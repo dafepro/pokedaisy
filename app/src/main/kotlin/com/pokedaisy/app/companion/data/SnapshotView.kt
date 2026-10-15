@@ -140,6 +140,8 @@ data class GamePickerView(
 
 data class SnapshotView(
     val connected: Boolean,
+    /** Exact-version Pinball companion; independent of the RPG party/map model. */
+    val pinball: PinballSnapshot? = null,
     val error: String? = null,
     /** The running ROM is one the companion can't read (see TelemetrySampler.detect). */
     val unsupported: Boolean = false,
@@ -205,7 +207,7 @@ data class SnapshotView(
 
 /** The game's data is in (not just detected): the save's party or the map. */
 val SnapshotView.hasData: Boolean
-    get() = connected && game != null && (party.isNotEmpty() || location.mapSecName.isNotEmpty())
+    get() = connected && (pinball != null || game != null && (party.isNotEmpty() || location.mapSecName.isNotEmpty()))
 
 /** This battler's moves with their effectiveness against [foe] instead of the
  * foe that's out (BATTLE INFO showing another of the trainer's Pokémon). */

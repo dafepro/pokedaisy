@@ -1,5 +1,6 @@
 package com.pokedaisy.app
 
+import com.pokedaisy.app.companion.data.PinballRsProfile
 import com.pokedaisy.app.companion.data.RETAIL_DUMPS
 import com.pokedaisy.app.companion.data.RETAIL_PORT_CODE_TITLES
 import com.pokedaisy.app.companion.data.TelemetrySampler
@@ -91,6 +92,7 @@ class SiteDataExportTest {
             append("  \"_generated\": ${q("by app/src/test/kotlin/com/pokedaisy/app/SiteDataExportTest.kt - don't edit by hand")},\n")
             append("  \"maxBaseSize\": 16777216,\n")
             append("  \"baseCodes\": {${listOf("BPRE", "BPEE").joinToString(", ") { "${q(it)}: ${q(codeTitles.getValue(it))}" }}},\n")
+            append("  \"pinball\": {\"code\": ${q(PinballRsProfile.CODE)}, \"rev\": ${PinballRsProfile.REVISION}, \"sha1\": ${q(PinballRsProfile.SHA1)}, \"title\": ${q(PinballRsProfile.TITLE)}},\n")
             // Hacks under a game code of their own (Ultra Violet's PUVV): their base game's title.
             append("  \"hackCodes\": {${TelemetrySampler.HACK_GAME_CODES.sorted().joinToString(", ") { "${q(it)}: ${q(codeTitles.getValue(hackCodeBases.getValue(it)))}" }}},\n")
             append("  \"retail\": [\n")
