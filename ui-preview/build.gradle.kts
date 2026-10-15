@@ -76,6 +76,8 @@ tasks.register<JavaExec>("render") {
     // of that size, at the density the app gives it there (sidePanelDensity).
     systemProperty("companionW", (project.findProperty("companionW") as String?) ?: "")
     systemProperty("companionH", (project.findProperty("companionH") as String?) ?: "")
+    // Pinball's repeated navigation checks; bounded to 1..10 rounds, default 4.
+    systemProperty("pinballNavRounds", (project.findProperty("pinballNavRounds") as String?) ?: "4")
     // Optional: a ROM the GUIDE's live pages (HERE, NEXT BOSS) read from, with the
     // repo's save fixture for that game - see Main.kt's liveGuide().
     systemProperty("rom", (project.findProperty("rom") as String?) ?: "")

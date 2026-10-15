@@ -1,0 +1,129 @@
+# User-supplied exact BPPE revision 0, pinned mGBA 26b7884.
+# Run through scripts/capture_pinball.py; @OUT@ is a private directory.
+# press consumes 2 frames; hold N consumes N+1 frames.
+dump @OUT@/ruby_boot
+shot @OUT@/ruby_boot/screen.ppm
+wait 300
+press START
+wait 180
+dump @OUT@/ruby_title
+shot @OUT@/ruby_title/screen.ppm
+press START
+wait 180
+dump @OUT@/ruby_menu
+shot @OUT@/ruby_menu/screen.ppm
+savestate @OUT@/ruby_menu.state
+press A
+wait 120
+dump @OUT@/ruby_field_select
+shot @OUT@/ruby_field_select/screen.ppm
+press A
+wait 30
+press A
+wait 600
+dump @OUT@/ruby_launch_ready
+shot @OUT@/ruby_launch_ready/screen.ppm
+savestate @OUT@/ruby_launch_ready.state
+hold A 60
+wait 120
+dump @OUT@/ruby_freeplay
+shot @OUT@/ruby_freeplay/screen.ppm
+savestate @OUT@/ruby_freeplay.state
+press START
+wait 30
+dump @OUT@/ruby_pause
+shot @OUT@/ruby_pause/screen.ppm
+wait 120
+dump @OUT@/ruby_pause_later
+shot @OUT@/ruby_pause_later/screen.ppm
+press START
+wait 30
+dump @OUT@/ruby_resume
+shot @OUT@/ruby_resume/screen.ppm
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+dump @OUT@/ruby_score
+shot @OUT@/ruby_score/screen.ppm
+wait 900
+dump @OUT@/ruby_after_wait
+shot @OUT@/ruby_after_wait/screen.ppm
+# Restore an earlier real state after gameplay has advanced.
+loadstate @OUT@/ruby_freeplay.state
+dump @OUT@/ruby_restored
+shot @OUT@/ruby_restored/screen.ppm
+# Weak launch and natural drains; no cheats or memory writes.
+loadstate @OUT@/ruby_launch_ready.state
+press A
+wait 270
+dump @OUT@/ruby_saver_return
+shot @OUT@/ruby_saver_return/screen.ppm
+wait 1530
+hold A 60
+wait 450
+hold A 60
+wait 480
+hold A 60
+wait 450
+hold A 60
+wait 120
+dump @OUT@/ruby_saver_under_second
+shot @OUT@/ruby_saver_under_second/screen.ppm
+wait 60
+dump @OUT@/ruby_saver_expired
+shot @OUT@/ruby_saver_expired/screen.ppm
+wait 180
+dump @OUT@/ruby_ball_end_2
+shot @OUT@/ruby_ball_end_2/screen.ppm
+wait 1440
+dump @OUT@/ruby_next_ball_1
+shot @OUT@/ruby_next_ball_1/screen.ppm
+hold A 60
+wait 450
+hold A 60
+wait 480
+hold A 60
+wait 450
+hold A 60
+wait 360
+dump @OUT@/ruby_ball_end_1
+shot @OUT@/ruby_ball_end_1/screen.ppm
+wait 1440
+dump @OUT@/ruby_next_ball_0
+shot @OUT@/ruby_next_ball_0/screen.ppm
+hold A 60
+wait 450
+hold A 60
+wait 480
+hold A 60
+wait 450
+hold A 60
+wait 360
+dump @OUT@/ruby_ball_end_0
+shot @OUT@/ruby_ball_end_0/screen.ppm
+wait 1440
+dump @OUT@/ruby_game_over
+shot @OUT@/ruby_game_over/screen.ppm
+# Attract playback is excluded even when its RAM resembles a live Catch mode.
+loadstate @OUT@/ruby_menu.state
+press B
+wait 3000
+dump @OUT@/demo_attract
+shot @OUT@/demo_attract/screen.ppm

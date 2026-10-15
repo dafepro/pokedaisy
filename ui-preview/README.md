@@ -21,6 +21,8 @@ gradle render -PcompanionW=960 -PcompanionH=1080   # the companion as a single-s
 gradle :data:test test            # synthetic Pinball reader + website compatibility parity
 gradle render -Ponly=pinball      # synthetic Pinball UI, navigation, and three device sizes
 gradle render -Ponly=pinball -Pdark=true -Pout=build/pinball-dark
+# Short-lived cloud sessions can isolate repeated navigation (default 4 rounds):
+gradle render -Ponly=pinball-synthetic-back-navigation-thor -PpinballNavRounds=2
 ```
 
 The Pinball tests and screenshots use synthetic data, not a ROM or captured gameplay.

@@ -24,6 +24,9 @@ import com.pokedaisy.app.companion.data.SnapshotView
 import com.pokedaisy.app.companion.ui.CompanionBack
 import com.pokedaisy.app.companion.ui.CompanionScreen
 
+/** Keep repeated navigation practical in short-lived cloud render invocations. */
+private val pinballNavRounds = System.getProperty("pinballNavRounds")?.toIntOrNull()?.coerceIn(1, 10) ?: 4
+
 /**
  * Synthetic inputs into the real companion, never captured RAM or a gameplay test.
  * Every panel says SYNTHETIC; no ROM, game art, real species or saved-state pictures
@@ -46,7 +49,7 @@ fun pinballShots(): List<Shot> = buildList {
         add(Shot("pinball-synthetic-back-navigation-${device.name}", device.w, device.h, device.density,
             pinballCompanion(syntheticPinballStates.getValue("catch"))) {
             assertPinball(syntheticPinballStates.getValue("catch"))
-            repeat(4) { round ->
+            repeat(pinballNavRounds) { round ->
                 println("pinball navigation ${device.name} round $round: open Settings")
                 onNodeWithContentDescription("Settings").performClick()
                 settlePinball()
@@ -92,7 +95,7 @@ fun pinballShots(): List<Shot> = buildList {
         val sampled = mutableStateOf(syntheticPinballStates.getValue("catch"))
         add(Shot("pinball-synthetic-sampling-navigation-${device.name}", device.w, device.h, device.density,
             pinballCompanion { sampled.value }) {
-            repeat(4) { round ->
+            repeat(pinballNavRounds) { round ->
                 println("pinball sampling ${device.name} round $round: open Settings")
                 onNodeWithContentDescription("Settings").performClick()
                 settlePinball()

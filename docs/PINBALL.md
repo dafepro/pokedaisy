@@ -38,11 +38,18 @@ Cloud verification on 2026-10-15:
 - All 26 website/manual tests pass, all translation entries pass validation,
   and the website builds 29 static pages. Nothing was deployed.
 - The actual Compose UI compiles against the existing Desktop Android shims.
-  Multi-size light/dark renders and navigation assertions are being verified.
+  All 30 static render/assertion cases pass: Catch, Evolution, free play, menu
+  and unavailable states at 1240x1080, 1280x960 and 1920x1080 in light/dark mode.
+  Two repeated Back-navigation cycles, two repeated sampling/tab cycles and
+  the shared Settings-to-States-to-Back check also pass. Screenshot inputs are
+  synthetic; they are not evidence of real Catch/Evolution gameplay.
 - The exact user-supplied ROM runs in pinned mGBA `26b7884`. The production
-  Kotlin reader passes 128 assertions against 22 private real-RAM captures:
+  Kotlin reader passes 304 assertions against 43 freshly reproduced private
+  real-RAM captures:
   both tables' boot/title/menu/selection, launch, ordinary play, pause and
-  resume, score, balls, area and saver countdown. No memory injection was used.
+  resume, score, balls, area, saver countdown/return/expiry, ball loss, game-over,
+  demo exclusion and state reload. Both reloads restored byte-identical EWRAM.
+  No memory injection was used.
   Pause froze the saver at 3,418 ticks across 120 frames, then resume advanced
   it to 3,386. The original game screens were privately inspected.
 
@@ -51,17 +58,30 @@ been completed. Cloud Desktop renders do not establish Android/JNI integration.
 
 Committed unit tests are authored byte arrays, not captured ROM/RAM/save data.
 The optional private capture checker reads user-owned files outside the repo.
-Compose preview images are synthetic UI scenarios, not screenshots of gameplay. No game art, ROM,
-save-state or copyrighted ROM dump is added to this repository.
+Compose preview images are synthetic UI scenarios, not screenshots of gameplay.
+No game art, ROM, save-state or copyrighted ROM dump is added to this repository.
 
-### Required real-game validation
+### Reproduction and remaining release checks
 
-Use a legally obtained user-supplied ROM matching the exact SHA-1 above. Confirm
-Ruby and Sapphire launch, ordinary play, Catch (bumper and hit phases), Evolution
-(item 3 and center hole), timeout, pause, ball saver, extra ball, bonus stage,
-menu return, state load and rewind. Compare the panel against the game screen
-and raw memory captured between frames. Test on Android before treating this as
-a release. A different ROM needs a separately evidenced profile.
+[Private runtime reproduction](../native-capture/boot/PINBALL.md) documents the
+pinned-core build and ordinary-button input scripts. `scripts/capture_pinball.py`
+requires a user-owned exact ROM and a fresh private output directory outside the
+repository. This command verifies identity and runs the production decoder:
+
+```sh
+gradle -p ui-preview :data:pinballCapture \
+  -Prom=/private/game.gba -Pcaptures=/private/captures
+```
+
+Only redacted field expectations and input scripts are committed.
+
+Still required: real Catch bumper/hit phases, Evolution item three/center-hole
+phases, event-timer timeout boundaries, extra balls, bonus stages and rewind.
+The demo's Catch-like memory establishes demo exclusion, not Catch guidance.
+Test the complete companion on Android, including state load, lifecycle and
+real-time readability, before treating this as a release. A headless mGBA state
+reload does not establish the Android application's state-load integration.
+A different ROM needs a separately evidenced profile.
 
 ## Primary-source mapping
 

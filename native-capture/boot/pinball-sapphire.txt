@@ -1,0 +1,125 @@
+# User-supplied exact BPPE revision 0, pinned mGBA 26b7884.
+# Run through scripts/capture_pinball.py; @OUT@ is a private directory.
+# press consumes 2 frames; hold N consumes N+1 frames.
+dump @OUT@/sapphire_boot
+shot @OUT@/sapphire_boot/screen.ppm
+wait 300
+press START
+wait 180
+dump @OUT@/sapphire_title
+shot @OUT@/sapphire_title/screen.ppm
+press START
+wait 180
+dump @OUT@/sapphire_menu
+shot @OUT@/sapphire_menu/screen.ppm
+savestate @OUT@/sapphire_menu.state
+press A
+wait 120
+dump @OUT@/sapphire_field_select
+shot @OUT@/sapphire_field_select/screen.ppm
+press RIGHT
+wait 60
+press A
+wait 30
+press A
+wait 600
+dump @OUT@/sapphire_launch_ready
+shot @OUT@/sapphire_launch_ready/screen.ppm
+savestate @OUT@/sapphire_launch_ready.state
+hold A 60
+wait 120
+dump @OUT@/sapphire_freeplay
+shot @OUT@/sapphire_freeplay/screen.ppm
+savestate @OUT@/sapphire_freeplay.state
+press START
+wait 30
+dump @OUT@/sapphire_pause
+shot @OUT@/sapphire_pause/screen.ppm
+wait 120
+dump @OUT@/sapphire_pause_later
+shot @OUT@/sapphire_pause_later/screen.ppm
+press START
+wait 30
+dump @OUT@/sapphire_resume
+shot @OUT@/sapphire_resume/screen.ppm
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+hold LEFT,A 20
+wait 10
+dump @OUT@/sapphire_score
+shot @OUT@/sapphire_score/screen.ppm
+wait 900
+dump @OUT@/sapphire_after_wait
+shot @OUT@/sapphire_after_wait/screen.ppm
+# Restore an earlier real state after gameplay has advanced.
+loadstate @OUT@/sapphire_freeplay.state
+dump @OUT@/sapphire_restored
+shot @OUT@/sapphire_restored/screen.ppm
+# Weak launch and natural drains; no cheats or memory writes.
+loadstate @OUT@/sapphire_launch_ready.state
+press A
+wait 330
+dump @OUT@/sapphire_saver_return
+shot @OUT@/sapphire_saver_return/screen.ppm
+wait 1470
+hold A 60
+wait 570
+hold A 60
+wait 540
+hold A 60
+wait 450
+dump @OUT@/sapphire_saver_under_second
+shot @OUT@/sapphire_saver_under_second/screen.ppm
+wait 60
+dump @OUT@/sapphire_saver_expired
+shot @OUT@/sapphire_saver_expired/screen.ppm
+wait 60
+hold A 60
+wait 390
+dump @OUT@/sapphire_ball_end_2
+shot @OUT@/sapphire_ball_end_2/screen.ppm
+wait 1470
+dump @OUT@/sapphire_next_ball_1
+shot @OUT@/sapphire_next_ball_1/screen.ppm
+hold A 60
+wait 570
+hold A 60
+wait 540
+hold A 60
+wait 570
+hold A 60
+wait 390
+dump @OUT@/sapphire_ball_end_1
+shot @OUT@/sapphire_ball_end_1/screen.ppm
+wait 1470
+dump @OUT@/sapphire_next_ball_0
+shot @OUT@/sapphire_next_ball_0/screen.ppm
+hold A 60
+wait 570
+hold A 60
+wait 540
+hold A 60
+wait 570
+hold A 60
+wait 390
+dump @OUT@/sapphire_ball_end_0
+shot @OUT@/sapphire_ball_end_0/screen.ppm
+wait 1470
+dump @OUT@/sapphire_game_over
+shot @OUT@/sapphire_game_over/screen.ppm
